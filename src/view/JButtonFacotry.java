@@ -12,10 +12,11 @@ import java.awt.event.ActionListener;
 public class JButtonFacotry {
     private Action action;
     private String path;
+    private ViewSerivce vs;
 
-    public JButtonFacotry(String path, View jFrame) {
+    public JButtonFacotry(String path, ViewSerivce vs) {
         this.path = path;
-        this.jFrame = jFrame;
+        this.vs = vs;
         String actName = "action." + path.split("\\.gif")[0];
         try {
             this.action = (Action) Class.forName(actName).newInstance();
@@ -39,7 +40,7 @@ public class JButtonFacotry {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                action.onAction(ViewSerivce.getInstance(jFrame));
+                action.onAction(vs);
             }
         });
         return button;

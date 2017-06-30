@@ -2,15 +2,31 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class View extends JFrame{
 
     private int width = 800;
     private int heigh = 600;
     private  JLabel jLabel;
+    private ViewSerivce vs;
+    private ActionListener itemAct;
+
+
     public View() throws HeadlessException {
+        this.itemAct = itemAct;
+        jLabel = new JLabel();
+        vs = new ViewSerivce(this, jLabel);
+        itemAct = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vs.menuDo(e.getActionCommand());
+
+            }
+        };
         initUI();
+
     }
 
     private void initUI() {
@@ -21,7 +37,7 @@ public class View extends JFrame{
         jPanel.setLayout(new BorderLayout());
         creatMenu();
         jPanel.add(BorderLayout.NORTH, createToolBar());
-        jLabel = new JLabel();
+
         jPanel.add(BorderLayout.CENTER, new JScrollPane(jLabel));
         this.add(jPanel);
         pack();
@@ -41,7 +57,7 @@ public class View extends JFrame{
         JPanel jPanel = new JPanel();
         jPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         for (int i = 0; i < images.length; i++) {
-            JButton button = new JButtonFacotry(images[i], this).getButton();
+            JButton button = new JButtonFacotry(images[i], vs).getButton();
             jPanel.add(button);
         }
         return jPanel;
@@ -63,7 +79,9 @@ public class View extends JFrame{
                 if (menuItemArrs[i][j].equals("-")) {
                     menu.addSeparator();
                 }else{
-                    menu.add(new JMenuItem(menuItemArrs[i][j]));
+                    JMenuItem item = new  JMenuItem(menuItemArrs[i][j]);
+                    item.addActionListener(itemAct);
+                    menu.add(item);
                 }
             }
             menuBar.add(menu);
@@ -71,15 +89,11 @@ public class View extends JFrame{
         setJMenuBar(menuBar);
     }
 
+
     public static void main(String[] args) {
         View v = new View();
         v.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         System.out.println("hello world");
     }
 
-    public void setBackIcon(File f) {
-        String imagePath = f.getAbsolutePath();
-        ImageIcon image = new ImageIcon(imagePath);
-        jLabel.setIcon(image);
-    }
 }

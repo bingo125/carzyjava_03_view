@@ -1,6 +1,7 @@
 package view;
 
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,19 +16,17 @@ public class ViewSerivce {
     private MyChooseFile chooseFile;
     private File curFile = null;
     private List<File> fileList;
+    private  JLabel label;
+    private  String dirBk;
 
-    public ViewSerivce(View jFrame) {
+
+
+    public ViewSerivce(View jFrame, JLabel label) {
         this.jFrame = jFrame;
+        this.label = label;
         fileList = new ArrayList<>();
     }
 
-    public static ViewSerivce getInstance(View frame) {
-        if (_self == null) {
-            _self = new ViewSerivce(frame);
-        }
-        return _self;
-    }
-    private  String dirBk;
 
     public void open() {
         if (dirBk == null) {
@@ -51,7 +50,8 @@ public class ViewSerivce {
     }
 
     private void showPic(File f) {
-        jFrame.setBackIcon(f);
+        String path = f.getAbsolutePath();
+        label.setIcon(new ImageIcon(path));
     }
 
     public void nextPic() {
@@ -71,13 +71,35 @@ public class ViewSerivce {
     }
 
     public void del() {
+        File last = curFile;
+        nextPic();
+        fileList.remove(last);
+        last.delete();
     }
 
+    private final double dispersion = 0.2;
 
     public void mkBig() {
+        zoom(false);
     }
 
     public void mkSmall() {
+        zoom(true);
+
+    }
+
+    private void zoom(boolean isTrue) {
+        int  wid = 0;
+        if(isTrue){
+            wid = (int) (label.getIcon().getIconWidth() * (1 - dispersion));
+        }else{
+            wid = (int) (label.getIcon().getIconWidth() * (1 + dispersion));
+        }
+        String path = curFile.getPath();
+        ImageIcon image = new ImageIcon(path);
+
+        ImageIcon newImage = new ImageIcon(image.getImage().getScaledInstance(wid, -1, Image.SCALE_DEFAULT));
+        label.setIcon(newImage);
     }
 
     public void previous() {
@@ -91,5 +113,38 @@ public class ViewSerivce {
             curFile = fileList.get(idx-1);
         }
         showPic(curFile);
+    }
+
+    public void menuDo(String menu) {
+        switch (menu) {
+            case "打开(O)":
+                open();
+                break;
+            case "退出(X)":
+                System.exit(0);
+                break;
+            case "放大(M)":
+                zoom(false);
+                break;
+            case "缩小(O)":
+                zoom(true);
+                break;
+            case "上一个(X)":
+                previous();
+                break;
+            case "下一个(P)":
+                nextPic();
+                break;
+            case "帮助主题":
+
+                break;
+            case "关于":
+                showDialog();
+                break;
+        }
+    }
+
+    private void showDialog() {
+        JOptionPane.showMessageDialog(jFrame, "Eggs are not supposed to be green.", "关于", JOptionPane.INFORMATION_MESSAGE);
     }
 }
